@@ -121,17 +121,17 @@ void enviar_msg() {
 }
 
 //configurar o roteador com base no arquivo router.config
-void config_roteador(int r_id) {
+void config_roteador(int id_logado) {
 
     FILE *config = fopen("roteador.config", "r");
 
     if (config) {
 
-        int l_id, port;
+        int id_origem, port;
         char ip[30];
 
-        for (int i = 0; fscanf(config, "%d %d %s", &l_id, &port, ip) != EOF; i++) {
-            if (l_id != r_id) continue;
+        for (int i = 0; fscanf(config, "%d %d %s", &id_origem, &port, ip) != EOF; i++) {
+            if (id_origem != id_logado) continue;
             else {
 
                 roteador.id     = id;
@@ -157,54 +157,37 @@ void config_roteador(int r_id) {
         die("Erro ao dar bind\n");
 }
 
-void topologia_rede (int r_id) {
+void topologia_rede (int id_logado) {
 
     FILE *links  = fopen("enlaces.config" , "r");
     FILE *config = fopen("roteador.config", "r");
 
-    int x, y, w;
-    int l_id, port;
+    int id_roteador, id_destino, distancia;
+    int id_origem, porta_socket;
     char ip[30];
 
-    if (links && config) {
-        for(int i = 0; fscanf(links, "%d %d %d", &x, &y, &w) != EOF; i++) {
-            for(int j = 0; fscanf(config, "%d %d %s", &l_id, &port, ip) != EOF; j++) {
-                if(r_id == x) {
-                    if(l_id == y) {
+    if (!(links && config)) {
+        printf("Falha ao encontrar arquivos de enlace.config ou roteador.config\n");
+        return;
+    }
 
-                        vizinho_tabela[y].port = port;
+    for(int i = 0; fscanf(links, "%d %d %d", &id_roteador, &id_destino, &distancia) != EOF; i++) {
+        for(int j = 0; fscanf(config, "%d %d %s", &id_origem, &porta_socket, ip) != EOF; j++) {
+            if(id_logado == id_roteador && id_origem == id_destino) {
+                vizinho_tabela[id_destino].port = porta_socket;
 
-                        strcpy(vizinho_tabela[y].ip, ip);
+                strcpy(vizinho_tabela[id_destino].ip, ip);
 
-                        roteamento_tabela[y].next = y;
-                        roteamento_tabela[y].cost = w;
-                        vizinho_tabela[y].cost    = w;
-                        dv_tabela[r_id].cost[y]   = w;
-                        
-                        continue;
-
-                    }
-                }
-
-                if(r_id == x) {
-                    if(l_id == y) {
-
-                        vizinho_tabela[x].port = port;
-
-                        strcpy(vizinho_tabela[x].ip, ip);
-
-                        roteamento_tabela[x].next = x;
-                        roteamento_tabela[x].cost = w;
-                        vizinho_tabela[x].cost    = w;
-                        dv_tabela[r_id].cost[x]   = w;
-
-                    }
-                }
+                roteamento_tabela[id_destino].next = id_destino;
+                roteamento_tabela[id_destino].cost = distancia;
+                vizinho_tabela[id_destino].cost    = distancia;
+                dv_tabela[id_logado].cost[id_destino]   = distancia;
+                
+                continue;
             }
-
-            rewind(config);
-
         }
+
+        rewind(config);
     }
 }
 
@@ -393,7 +376,6 @@ void inicializa_threads() {
     pthread_create(&recebe     , NULL, recebe_pacote  , NULL);
     pthread_create(&envia_vetor, NULL, envia_dv       , NULL);
     pthread_create(&envia_msg  , NULL, envia_mensagem , NULL);
-    //pthread_create(&still_alive, NULL, check_alive  , NULL);
 
 }
 
