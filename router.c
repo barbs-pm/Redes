@@ -1,21 +1,7 @@
-// gcc router.c -o router -lpthread
-// ./router
-
 #include "src/router.h"
 #include "src/funcoesMsg.h"
-
-//coverter char pra int copiei da internet
-int toint(char *str) {
-
-  int ans;
-  ans = 0;
-
-  for(int i = strlen(str) - 1, pot = 1; i >= 0; i--, pot *= 10)
-    ans += pot * (str[i] - '0');
-    
-  return ans;   
-
-}
+#include "src/uteis.h"
+#include "src/funcoesDv.h"
 
 //configurar o roteador com base no arquivo router.config
 void config_roteador(int id_logado) {
@@ -37,6 +23,7 @@ void config_roteador(int id_logado) {
 
             } 
         }
+
     } else printf("Erro ao configurar o roteador. Pressione ENTER para voltar.");
 
     fclose(config);
@@ -70,6 +57,7 @@ void topologia_rede (int id_logado) {
 
     for(int i = 0; fscanf(links, "%d %d %d", &id_roteador, &id_destino, &distancia) != EOF; i++) {
         for(int j = 0; fscanf(config, "%d %d %s", &id_origem, &porta_socket, ip) != EOF; j++) {
+            
             if(id_logado == id_roteador && id_origem == id_destino) {
                 vizinho_tabela[id_destino].port = porta_socket;
 
@@ -81,6 +69,19 @@ void topologia_rede (int id_logado) {
                 dv_tabela[id_logado].cost[id_destino]   = distancia;
                 
                 continue;
+            }
+
+            if(id_logado == id_destino && id_origem == id_roteador)
+
+                vizinho_tabela[x].port = port;
+
+                strcpy(vizinho_tabela[x].ip, ip);
+
+                roteamento_tabela[x].next = x;
+                roteamento_tabela[x].cost = w;
+                vizinho_tabela[x].cost    = w;
+                dv_tabela[r_id].cost[x]   = w;
+
             }
         }
 
@@ -113,9 +114,10 @@ void *recebe_pacote(void *n) {
                 msg_flag = 1;
 
             }
+
         } else if (pkg_in.type == DISTANCIA_VETOR) {
 
-            alive_flag[pkg_in.source] = 1;
+            flag_estado[pkg_in.source] = 1;
 
             for (int i = 0; i < MAX_ROT; i++) {
                 if (pkg_in.dv[pkg_in.source].cost[i] == INF && roteamento_tabela[i].next == pkg_in.source) {
@@ -143,82 +145,6 @@ void *recebe_pacote(void *n) {
     }
 }
 
-
-
-void transfer_dv(char why){
-  Pacote msg;
-
-  for(int n_id = 0; n_id < MAX_ROT; n_id++){
-    if(vizinho_tabela[n_id].cost != INF && vizinho_tabela[n_id].port != -1){
-      msg = criar_msg(DISTANCIA_VETOR, n_id);
-      socket_other.sin_port = htons(vizinho_tabela[n_id].port);
-
-      if(inet_aton(vizinho_tabela[n_id].ip, &socket_other.sin_addr) == 0)
-        die("Erro na obtenção do IP do destino (Vetores Distância)\n");
-      else if(sendto(sckt, &msg, sizeof(msg), 0, (struct sockaddr*) &socket_other, sizeof(socket_other)) == -1)
-        die("Erro ao enviar vetores distância\n");
-      /*else if(why == 'C')
-        printf("\nRoteador %d enviando vetores distância para roteador %d. Houve mudança na tabela de roteamento.\n", id, n_id);*/
-    }
-  }
-}
-
-void *envia_dv(void *n){
-
-  time_t timer;
-
-  timer = time(0);
-
-  sleep(1);
-
-  while(1){
-
-    pthread_mutex_lock(&envia_mutex);
-
-    double dv_exec_time = difftime(time(0), timer);
-
-    if (dv_alterado == TRUE) {
-
-      transfer_dv('C');
-      dv_alterado = FALSE;
-      timer = time(0);
-
-    } else if (dv_exec_time >= TEMPO_ENVIO) {
-
-      transfer_dv('T');
-      timer = time(0);
-
-    }
-
-    pthread_mutex_unlock(&envia_mutex);
-
-  }
-}
-
-int login() {
-
-    int id;
-
-    system("clear");
-	printf("___________~<>~___________\n");
-    printf("SEJA BEM-VINDO AO CHAT UOL!\n\n");
-
-    while(1) {
-
-        printf("Por favor, informe o login: ");
-        scanf("%d", &id);
-
-        if (id < 0 || id >= MAX_ROT) 
-            printf("Login inválido.\n");
-        else
-            break;
-
-    };
-    
-    return id; 
-    
-}
-
 void inicializa_tabelas() {
 
     for (int i = 0; i < MAX_ROT; i++) {
@@ -244,36 +170,43 @@ void inicializa_tabelas() {
 
 }
 
-void inicializa_threads() {
+void *checa_estado(void *n) {
+    time_t timer;
 
-    pthread_create(&recebe     , NULL, recebe_pacote  , NULL);
-    pthread_create(&envia_vetor, NULL, envia_dv       , NULL);
-    pthread_create(&envia_msg  , NULL, envia_mensagem , NULL);
+    timer = time(0);
 
+    while (1) {
+        if (difftime(time(0), timer) >= 3 * TEMPO_ENVIO) {
+            
+            pthread_mutex_lock(&envia_mutex);
+            
+            for (int i = 0; i < MAX_ROT; i++) {
+                if (flag_estado[i] != 1 && i != id && vizinho_tabela[i].cost != INF) {
+                    for (int j = 0; j < MAX_ROT; j++)
+                        dv_tabela[id].cost[j] = vizinho_tabela[j].cost;
+
+                    dv_tabela[id].cost[i]     = INF;
+                    dv_tabela[i].cost[id]     = INF;
+                    vizinho_tabela[i].cost    = INF;
+                    roteamento_tabela[i].next = -1;
+                    roteamento_tabela[i].cost = INF;
+                    dv_alterado               = TRUE;
+                }
+            }
+
+            memset(flag_estado, 0, sizeof(flag_estado));
+            pthread_mutex_unlock(&envia_mutex);
+            timer = time(0);
+        }
+    }
 }
 
-void menu() {
+void inicializa_threads() {
 
-    int op;
-
-    do {
-
-		system("clear");
-		printf("___________~<>~___________\n");
-        printf("      ROTEADOR %d\n\n", id);
-		printf("|0| Sair\n");
-		printf("|1| Enviar Mensagem\n");
-		printf("|2| Visualizar Mensagem\n");
-		printf("___________~<>~___________\n");
-		printf("Escolha sua opção: ");
-		scanf("%d", &op);
-
-		switch(op){ 
-			case 1: enviar_msg(); break;
-            case 2: ler_msg(); break;
-		}
-	
-	} while(op != 0);
+    pthread_create(&recebe         , NULL, recebe_pacote  , NULL);
+    pthread_create(&envia_vetor    , NULL, envia_dv       , NULL);
+    pthread_create(&envia_msg      , NULL, envia_mensagem , NULL);
+    pthread_create(&estado_roteador, NULL, checa_estado   , NULL);
 
 }
 
@@ -289,7 +222,7 @@ int main() {
     config_roteador(id);
     inicializa_tabelas();
 
-    memset(alive_flag, 0, sizeof(alive_flag));
+    memset(flag_estado, 0, sizeof(flag_estado));
 
     topologia_rede(id);
     inicializa_threads();

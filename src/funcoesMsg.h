@@ -1,10 +1,10 @@
-
 void die(char *s){
 
   perror(s);
   exit(1);
 
 }
+
 void ler_msg() {
 
     system("clear");
@@ -88,27 +88,27 @@ void enviar_msg() {
 }
 
 void *envia_mensagem(void *n){
-  Pacote msg;
-  int next;
+    Pacote msg;
+    int next;
 
-  while(1){
-    if(msg_flag){
-      pthread_mutex_lock(&envia_mutex);
+    while(1){
+        if(msg_flag){
+            pthread_mutex_lock(&envia_mutex);
 
-      msg = msg_out;
-      next = roteamento_tabela[msg_out.destination].next;
+            msg = msg_out;
+            next = roteamento_tabela[msg_out.destination].next;
 
-      socket_other.sin_port = htons(vizinho_tabela[next].port);
+            socket_other.sin_port = htons(vizinho_tabela[next].port);
 
-      if(inet_aton(vizinho_tabela[next].ip, &socket_other.sin_addr) == 0)
-        die("Erro na obtenção do IP do destino (Mensagem)\n");
-      else
-      if(sendto(sckt, &msg, sizeof(msg), 0, (struct sockaddr*) &socket_other, sizeof(socket_other)) == -1)
-        die("Erro ao enviar mensagem\n");
+            if(inet_aton(vizinho_tabela[next].ip, &socket_other.sin_addr) == 0)
+                die("Erro na obtenção do IP do destino (Mensagem)\n");
+            else
+            if(sendto(sckt, &msg, sizeof(msg), 0, (struct sockaddr*) &socket_other, sizeof(socket_other)) == -1)
+                die("Erro ao enviar mensagem\n");
 
-      msg_flag = 0;
+            msg_flag = 0;
 
-      pthread_mutex_unlock(&envia_mutex);
+            pthread_mutex_unlock(&envia_mutex);
+        }
     }
-  }
 }

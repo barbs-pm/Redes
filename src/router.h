@@ -55,10 +55,10 @@ Distancia_vetor dv_tabela[MAX_ROT];
 Pacote          msg_in[TAM_FILA], msg_out; //filas do roteador
 
 int sckt, id, dv_alterado = 1, msg_flag, msg_control_in = 0, msg_id_control = 0;
-int alive_flag[MAX_ROT];
+int flag_estado[MAX_ROT];
 
 struct sockaddr_in socket_in_me, socket_other;
 
 //threads
-pthread_t       recebe, envia_msg, envia_vetor, still_alive;
+pthread_t       recebe, envia_msg, envia_vetor, estado_roteador;
 pthread_mutex_t envia_mutex = PTHREAD_MUTEX_INITIALIZER;
