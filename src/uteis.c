@@ -35,20 +35,28 @@ int login() {
     
 }
 
+
+void cabecalho_menus() {
+
+    system("clear");
+    printf("___________~<>~___________\n");
+    printf("      ROTEADOR %d\n\n", id);
+
+}
+
 void menu() {
 
     int op;
 
     do {
 
-		system("clear");
-		printf("___________~<>~___________\n");
-        printf("      ROTEADOR %d\n\n", id);
+		cabecalho_menus();
 		printf("|0| Sair\n");
 		printf("|1| Enviar Mensagem\n");
 		printf("|2| Visualizar Mensagem\n");
         printf("|3| Mostrar vetor distância\n");
         printf("|4| Mostar tabela de roteamento\n");
+        printf("|5| Mostar log vetor distância\n");
 		printf("___________~<>~___________\n");
 		printf("Escolha sua opção: ");
 		scanf("%d", &op);
@@ -58,6 +66,7 @@ void menu() {
             case 2: ler_msg(); break;
             case 3: ver_dv(); break;
             case 4: ver_tabela_roteamento(); break;
+            case 5: log_dv(); break;
 		}
 	
 	} while(op != 0);

@@ -7,8 +7,8 @@ void die(char *s){
 
 void ler_msg() {
 
-    system("clear");
-    printf("___________~<>~___________\n");
+    cabecalho_menus();
+    printf("Histórico de mensagens:\n\n");
 
     for (int i = 0; i <= msg_control_in; i++) {
         if (i < msg_control_in && msg_in[i].source != 0) {
@@ -37,6 +37,7 @@ Pacote criar_msg (int type, int destino) {
     if (type == MSG) {
         msg.msg_id = msg_control_in++;
         
+        cabecalho_menus();
         printf("Digite sua mensagem... \n");
         getchar();
 
@@ -57,32 +58,32 @@ Pacote criar_msg (int type, int destino) {
 void enviar_msg() {
 
     int destino = -1;
+    char* msg_retorno = "";
 
-    system("clear");
-
-    printf("___________~<>~___________\n");
+    cabecalho_menus();
     printf("Informe o roteador de destino: ");
     scanf("%d", &destino);
+    cabecalho_menus();
 
-    if (destino < 0 || destino >= MAX_ROT) {
-        printf("O roteador não existe. Pressione ENTER para voltar.");
-        getchar();
+    if (destino == id) 
+        msg_retorno = "Você não pode enviar mensagens a si mesmo.";
+
+    else if (destino < 0 || destino >= MAX_ROT) 
+        msg_retorno = "O roteador não existe.";
+
+    else if (roteamento_tabela[destino].next == -1) 
+        msg_retorno = "Impossível chegar ao roteador.";
+
+    else {
+        msg_out = criar_msg(MSG, destino);
+        msg_flag = 1;
+        msg_retorno = "Mensagem enviada";
     }
 
-    if (roteamento_tabela[destino].next == -1) {
-        printf("Impossível chegar ao roteador. Pressione ENTER para voltar.");
-        getchar();
-    }
-
-    if (destino == id) {
-        printf("Você não pode enviar mensagens a si mesmo. Pressione ENTER para voltar.");
-        getchar();
-    }
-
-    msg_out = criar_msg(MSG, destino);
-    msg_flag = 1;
-
-    printf("___________~<>~___________\nMensagem enviada. Pressione ENTER para voltar");
+    printf("___________~<>~___________\n");
+    printf("%s", msg_retorno);
+    printf("\nPressione ENTER para voltar");
+    getchar();
     getchar();
 
 }

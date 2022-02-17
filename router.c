@@ -1,7 +1,7 @@
 #include "src/router.h"
-#include "src/funcoesMsg.h"
-#include "src/funcoesDv.h"
-#include "src/uteis.h"
+#include "src/funcoesMsg.c"
+#include "src/funcoesDv.c"
+#include "src/uteis.c"
 
 //configurar o roteador com base no arquivo router.config
 void config_roteador(int id_logado) {
@@ -170,26 +170,6 @@ void inicializa_tabelas() {
     roteamento_tabela[id].cost = 0;
     roteamento_tabela[id].next = id;
 
-    ver_tabela_roteamento();
-
-}
-
-void ver_tabela_roteamento() {
-
-    system("clear");
-    printf("___________~<>~___________\n");
-    printf("\nTabela de roteamento do roteador %d\n\n", id);
-
-    for (int i = 0; i < MAX_ROT; i++)
-        if (roteamento_tabela[i].cost != INF)
-            printf("Para %d - Próximo: %2d, com custo: %d\n", i, roteamento_tabela[i].next, roteamento_tabela[i].cost);
-        else
-            printf("Para %d - Próximo: %2d, com custo: INF\n", i, roteamento_tabela[i].next);
-
-    printf("___________~<>~___________\n");
-    printf("Pressione ENTER para voltar ao menu");
-    getchar();
-    getchar();
 }
 
 void *checa_estado(void *n) {
@@ -199,7 +179,6 @@ void *checa_estado(void *n) {
 
     while (1) {
         if (difftime(time(0), timer) >= 3 * TEMPO_ENVIO) {
-            
             pthread_mutex_lock(&envia_mutex);
             
             for (int i = 0; i < MAX_ROT; i++) {
@@ -213,12 +192,15 @@ void *checa_estado(void *n) {
                     roteamento_tabela[i].next = -1;
                     roteamento_tabela[i].cost = INF;
                     dv_alterado               = TRUE;
+
                 }
             }
 
+            
             memset(flag_estado, 0, sizeof(flag_estado));
             pthread_mutex_unlock(&envia_mutex);
             timer = time(0);
+
         }
     }
 }
