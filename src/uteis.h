@@ -57,6 +57,7 @@ void menu() {
 			case 1: enviar_msg(); break;
             case 2: ler_msg(); break;
             case 3: ver_dv(); break;
+            case 4: ver_tabela_roteamento(); break;
 		}
 	
 	} while(op != 0);

@@ -58,16 +58,16 @@ void ver_dv() {
         
         printf("\n");
         
-        for (int j = 0; i < MAX_ROT; j++) {
+        for (int j = 0; j < MAX_ROT; j++) {
         
             if (vizinho_tabela[i].cost != INF || i == id) 
-                if (dv_tabela[i].cost != INF)
+                if (dv_tabela[i].cost[j] != INF)
                     printf("Origem: %d para destino: %d, com custo = %d\n", i, j, dv_tabela[i].cost[j]); 
                 else
                     printf("Origem: %d para destino: %d, com custo = INF\n", i, j);
             else {
-                printf("Não possui os vetores de %d\n", i)
-                break
+                printf("Não possui os vetores de %d\n", i);
+                break;
             }
         }
     }

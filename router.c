@@ -1,7 +1,7 @@
 #include "src/router.h"
 #include "src/funcoesMsg.h"
-#include "src/uteis.h"
 #include "src/funcoesDv.h"
+#include "src/uteis.h"
 
 //configurar o roteador com base no arquivo router.config
 void config_roteador(int id_logado) {
@@ -63,24 +63,24 @@ void topologia_rede (int id_logado) {
 
                 strcpy(vizinho_tabela[id_destino].ip, ip);
 
-                roteamento_tabela[id_destino].next = id_destino;
-                roteamento_tabela[id_destino].cost = distancia;
-                vizinho_tabela[id_destino].cost    = distancia;
-                dv_tabela[id_logado].cost[id_destino]   = distancia;
+                roteamento_tabela[id_destino].next    = id_destino;
+                roteamento_tabela[id_destino].cost    = distancia;
+                vizinho_tabela[id_destino].cost       = distancia;
+                dv_tabela[id_logado].cost[id_destino] = distancia;
                 
                 continue;
             }
 
-            if(id_logado == id_destino && id_origem == id_roteador)
+            if(id_logado == id_destino && id_origem == id_roteador) {
 
-                vizinho_tabela[x].port = port;
+                vizinho_tabela[id_roteador].port = porta_socket;
 
-                strcpy(vizinho_tabela[x].ip, ip);
+                strcpy(vizinho_tabela[id_roteador].ip, ip);
 
-                roteamento_tabela[x].next = x;
-                roteamento_tabela[x].cost = w;
-                vizinho_tabela[x].cost    = w;
-                dv_tabela[r_id].cost[x]   = w;
+                roteamento_tabela[id_roteador].next     = id_roteador;
+                roteamento_tabela[id_roteador].cost     = distancia;
+                vizinho_tabela[id_roteador].cost        = distancia;
+                dv_tabela[id_logado].cost[id_roteador]  = distancia;
 
             }
         }
@@ -157,8 +157,10 @@ void inicializa_tabelas() {
 
         for (int j = 0; j < MAX_ROT; j++) {
 
-            dv_tabela[i].cost[j] = INF;     
-            if (roteamento_tabela[j].next == i) roteamento_tabela[j].next = -1;
+            dv_tabela[i].cost[j] = INF;  
+
+            if (roteamento_tabela[j].next == i) 
+                roteamento_tabela[j].next = -1;
 
         }
     }
@@ -168,6 +170,26 @@ void inicializa_tabelas() {
     roteamento_tabela[id].cost = 0;
     roteamento_tabela[id].next = id;
 
+    ver_tabela_roteamento();
+
+}
+
+void ver_tabela_roteamento() {
+
+    system("clear");
+    printf("___________~<>~___________\n");
+    printf("\nTabela de roteamento do roteador %d\n\n", id);
+
+    for (int i = 0; i < MAX_ROT; i++)
+        if (roteamento_tabela[i].cost != INF)
+            printf("Para %d - Próximo: %2d, com custo: %d\n", i, roteamento_tabela[i].next, roteamento_tabela[i].cost);
+        else
+            printf("Para %d - Próximo: %2d, com custo: INF\n", i, roteamento_tabela[i].next);
+
+    printf("___________~<>~___________\n");
+    printf("Pressione ENTER para voltar ao menu");
+    getchar();
+    getchar();
 }
 
 void *checa_estado(void *n) {
