@@ -48,6 +48,7 @@ __________~<>~___________
 Escolha sua opção:       
 ```
 <br>
+
 ## Implementação
 
 Funções desenvolvidas foram:
