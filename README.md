@@ -1,8 +1,8 @@
-## Protocolo de Roteamento de Redes
+# Protocolo de Roteamento de Redes
 
-**Objetivo:** Implementar um protocolo de roteamento de redes via sockets UDP executando o algoritmo de Bellman-Ford distribuído<br>
+**Objetivo:** Implementar um protocolo de roteamento de redes via sockets UDP executando o algoritmo de Bellman-Ford distribuído
 
-**Funcionamento:** 
+## Funcionamento 
 Cada roteador executa como um processo (multithread) individual. O programa obtém as informações de configuração via arquivos. Cada roteador é capaz de se comunicar com outros roteadores (i.e., mesmo programa instanciado múltiplas vezes) através de sockets UDP. 
 O arquivo roteador.config é utilizado para especificar os dados dos roteadores, no padrão: ID Porta Socket IP. No exemplo abaixo, existem três roteadores disponíveis (que podem ser alterados no arquivo conforme necessidade):
 ```
@@ -17,7 +17,7 @@ O arquivo enlaces.config descreve o custo dos enlaces entre os roteadores, no pa
 1 3 3
 ```
 
-**Como compilar:**
+## Como compilar
 Caso possua o make instalado em sua máquina, abra o terminal e execute o seguinte comando
 ```
 make run
@@ -30,7 +30,7 @@ gcc router.c -o router -lpthread
 Ao entrar no programa, será exibido uma mensagem pedindo pelo ID do roteador a ser logado, insira um ID que exista no arquivo roteador.config e escolha uma das opções disponíveis.
 Abra um novo terminal pra cada roteador inicializado.
 
-**Saída do programa:**
+## Saída do programa
 <br>
 Ao executar o programa, o mesmo exibe uma mensagem exigindo o ID a ser logado. Após inserir o dado, exibe um menu com as opções disponíveis:
 
@@ -49,7 +49,7 @@ Escolha sua opção:
 ```
 <br>
 
-## Implementação
+## Implementação e estrutura
 
 Funções desenvolvidas foram:
 1. Geração do login e menu
@@ -57,7 +57,12 @@ Funções desenvolvidas foram:
 3. Cria as tabelas que irão receber os dados da topologia da rede
 4. Inicializada a função de topologia que irá salvar as informações dos vizinhos
 5. A inicialização das threads recebe, envia_vetor, envia_msg, estado_roteador
-6. aqui complica akakka --TODO
+      - recebe: o roteador recebe o pacote, identifica se é uma mensagem ou se ínformação do vetor distância. Se for uma mensagem pra ele, é tratada para ser lida. Se for para outro roteador, a mensagem é retransmitida para um vizinho. Se for um vetor distância, ele executa o algoritmo de Bellman-Ford e atualiza a tabela de roteamento.
+      - envia_vetor: cria a mensagem do tipo vetor distância, calcula o tempo em que foi feito isso para futuramente conferir se o roteador permanece ativo desde o último envio. Chama uma função para salvar os logs de alteração da tabela de roteamento.
+      - envia_mensagem: tenta obter as informações do roteador para enviar, e se der tudo certo, tenta fazer o envio da mensagem.
+      - estado_roteador: caso o roteador está inativo ha uma certa quantidade de tempo desde seu último envio (mensagem, ou vetor distância), ele é "desligado".
+
+**Src:** a pasta scr funciona para separar os códigos conforme sua utilidade. No arquivo uteis.c você irá encontrar funções para controle do menu, impressão de cabeçalhos, conversão de str para int. No arquivo router.h irá encontrar as structs e variáveis globais presentes no programa. No arquivo funcoesDv.c estarão os arquivos que em sua maioria alteram o vetor distância, enviam ele bem como a tabela de roteamento. No arquivo funcoesMsg.c é a mesma coisa, porém relacionado as mensagens
 
 ## Como Contribuir
 
@@ -73,4 +78,4 @@ Para contribuir e deixar a comunidade open source um lugar incrivel para aprende
 
 ## Autora
 
-- **[Bárbara Pegoraro Markus](https://github.com/barbs-pm)** - _Acadêmica do Curso de Ciência da Computação -UFFS_. 
+- **[Bárbara Pegoraro Markus](https://github.com/barbs-pm)** - _Acadêmica do Curso de Ciência da Computação - UFFS_. 
