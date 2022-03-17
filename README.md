@@ -57,7 +57,7 @@ Funções desenvolvidas foram:
 3. Cria as tabelas que irão receber os dados da topologia da rede
 4. Inicializada a função de topologia que irá salvar as informações dos vizinhos
 5. A inicialização das threads recebe, envia_vetor, envia_msg, estado_roteador
-      - recebe: o roteador recebe o pacote, identifica se é uma mensagem ou se ínformação do vetor distância. Se for uma mensagem pra ele, é tratada para ser lida. Se for para outro roteador, a mensagem é retransmitida para um vizinho. Se for um vetor distância, ele executa o algoritmo de Bellman-Ford e atualiza a tabela de roteamento.
+      - recebe: o roteador recebe o pacote, identifica se é uma mensagem ou se é informação do vetor distância. Se for uma mensagem pra ele, é tratada para ser lida. Se for para outro roteador, a mensagem é retransmitida para um vizinho. Se for um vetor distância, ele executa o algoritmo de Bellman-Ford e atualiza a tabela de roteamento.
       - envia_vetor: cria a mensagem do tipo vetor distância, calcula o tempo em que foi feito isso para futuramente conferir se o roteador permanece ativo desde o último envio. Chama uma função para salvar os logs de alteração da tabela de roteamento.
       - envia_mensagem: tenta obter as informações do roteador para enviar, e se der tudo certo, tenta fazer o envio da mensagem.
       - estado_roteador: caso o roteador está inativo ha uma certa quantidade de tempo desde seu último envio (mensagem, ou vetor distância), ele é "desligado".

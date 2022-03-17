@@ -28,7 +28,6 @@ void transfer_dv(char why) {
 }
 
 void *envia_dv(void *n) {
-    time_t timer;
     timer = time(0);
     sleep(1);
 
@@ -41,12 +40,11 @@ void *envia_dv(void *n) {
         if (dv_alterado == TRUE) {
             transfer_dv('C');
             dv_alterado = FALSE;
-            timer = time(0);
         } else if (dv_exec_time >= TEMPO_ENVIO) {
             transfer_dv('T');
-            timer = time(0);
         }
 
+        timer = time(0);
         pthread_mutex_unlock(&envia_mutex);
     }
 }

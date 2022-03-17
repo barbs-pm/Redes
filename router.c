@@ -173,9 +173,6 @@ void inicializa_tabelas() {
 }
 
 void *checa_estado(void *n) {
-    time_t timer;
-
-    timer = time(0);
 
     while (1) {
         if (difftime(time(0), timer) >= 3 * TEMPO_ENVIO) {
