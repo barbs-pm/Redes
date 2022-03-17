@@ -14,13 +14,11 @@ void config_roteador(int id_logado) {
         char ip[30];
 
         for (int i = 0; fscanf(config, "%d %d %s", &id_origem, &port, ip) != EOF; i++) {
-            if (id_origem != id_logado) continue;
-            else {
-
+            if (id_origem == id_logado) {
                 roteador.id     = id;
                 roteador.port   = port;
                 strcpy(roteador.ip, ip);
-
+                break;
             } 
         }
 
@@ -174,7 +172,6 @@ void inicializa_tabelas() {
 
 void *checa_estado(void *n) {
     time_t timer;
-
     timer = time(0);
 
     while (1) {
@@ -195,8 +192,7 @@ void *checa_estado(void *n) {
 
                 }
             }
-
-            
+          
             memset(flag_estado, 0, sizeof(flag_estado));
             pthread_mutex_unlock(&envia_mutex);
             timer = time(0);
