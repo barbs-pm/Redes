@@ -31,7 +31,6 @@ Ao entrar no programa, será exibido uma mensagem pedindo pelo ID do roteador a 
 Abra um novo terminal pra cada roteador inicializado.
 
 ## Saída do programa
-<br>
 Ao executar o programa, o mesmo exibe uma mensagem exigindo o ID a ser logado. Após inserir o dado, exibe um menu com as opções disponíveis:
 
 ```
@@ -47,10 +46,8 @@ ___________~<>~___________
 __________~<>~___________
 Escolha sua opção:       
 ```
-<br>
 
 ## Implementação e estrutura
-## Implementação
 
 Funções desenvolvidas foram:
 1. Geração do login e menu
@@ -74,8 +71,6 @@ Para contribuir e deixar a comunidade open source um lugar incrivel para aprende
 3. Realize o Commit (`git commit -m 'Add some featureCompilador'`)
 4. Realize o Push no Branch (`git push origin feature/featureCompilador`)
 5. Abra um Pull Request
-
-<br>
 
 ## Autora
 

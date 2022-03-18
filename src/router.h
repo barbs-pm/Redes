@@ -62,6 +62,7 @@ DV_log          dv_logs[100];
 
 int sckt, id, dv_alterado = 1, msg_flag, msg_control_in = 0, msg_id_control = 0, count_log = 0;
 int flag_estado[MAX_ROT];
+time_t timer;
 
 struct sockaddr_in socket_in_me, socket_other;
 
