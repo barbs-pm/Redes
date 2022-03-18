@@ -70,7 +70,7 @@ void ver_dv() {
                 else
                     printf("Origem: %d para destino: %d, com custo = INF\n", i, j);
             else {
-                printf("O roteador %d está desligado.", i);
+                printf("O roteador %d está desligado ou é inalcançavel.", i);
                 break;
             }
         }

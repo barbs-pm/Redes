@@ -55,8 +55,8 @@ void menu() {
 		printf("|1| Enviar Mensagem\n");
 		printf("|2| Visualizar Mensagem\n");
         printf("|3| Mostrar vetor distância\n");
-        printf("|4| Mostar tabela de roteamento\n");
-        printf("|5| Mostar log vetor distância\n");
+        printf("|4| Mostrar tabela de roteamento\n");
+        printf("|5| Mostrar log vetor distância\n");
 		printf("___________~<>~___________\n");
 		printf("Escolha sua opção: ");
 		scanf("%d", &op);
